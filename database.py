@@ -1,7 +1,7 @@
 import os
 import psycopg2
 from dotenv import load_dotenv
-from models import User
+from models import User, DBUser
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 if os.path.exists(dotenv_path):
@@ -37,10 +37,38 @@ def get_users():
     cur = conn.cursor()
     cur.execute('SELECT * FROM users;')
     rows = cur.fetchall()
-    users = [User(id=row[0], firstname=row[1], lastname=row[2],email=row[3], birth_year=row[4] ) for row in rows]
+    users = [DBUser(id=row[0], firstname=row[1], lastname=row[2],email=row[3], birth_year=row[4] ) for row in rows]
     cur.close()
     conn.close()
     return users
+
+def get_user(userid: int):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM users WHERE id = %s;', (userid,))
+    row = cur.fetchone()
+    print(row)
+    if row is None:
+        return None
+    user=DBUser(id=row[0], firstname=row[1], lastname=row[2],email=row[3], birth_year=row[4])
+    cur.close()
+    conn.close()
+    return user
+
+def delete_user(userid: int):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM users WHERE id = %s;', (userid,))
+    row = cur.fetchone()
+    print(row)
+    if row is None:
+        cur.close()
+        conn.close()
+        return False
+    cur.execute('DELETE FROM users WHERE id = %s;', (userid,))
+    conn.commit()
+    cur.close()
+    conn.close()
 
 def save_user(user):
     conn = get_db_connection()

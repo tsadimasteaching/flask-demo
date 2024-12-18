@@ -6,7 +6,7 @@ import os
 import psycopg2
 import secrets
 from models import User
-from database import get_db_connection, init_db, get_users, save_user
+from database import get_db_connection, init_db, get_users, save_user, get_user, delete_user
 app = Flask(__name__)
 bootstrap = Bootstrap5(app)
 csrf = CSRFProtect(app)
@@ -52,10 +52,19 @@ def show_user_form():
 @app.route('/user/<int:id>')
 def show_user(id):
     found=False
-    for user in users:
-        if user.id == id:
-            found
-            form = UserForm(obj=user)
-            return render_template('users/user.html',form=form)
-    if not found:
+    user = get_user(id)
+    if user:
+        form = UserForm(obj=user)
+        return render_template('users/user.html', form=form)
+    else:
         return render_template('users/users.html',users=users, message="User not found")
+
+@app.route('/deleteuser/<int:id>')
+def delete_user_from_db(id):
+    found=False
+    result = delete_user(id)
+    users = get_users()
+    if result:
+        return redirect(url_for("show_users", users=users))
+    else:
+        return redirect(url_for("show_users", users=users, message="User not found"))
