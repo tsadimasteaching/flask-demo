@@ -4,7 +4,7 @@ from wtforms.validators import DataRequired, Length, Email
 
 
 class UserForm(FlaskForm):
-    id = IntegerField('Id', validators=[DataRequired()])
+    # id = IntegerField('Id', validators=[DataRequired()])
     firstname = StringField('First Name', validators=[DataRequired(), Length(min=2, max=20)])
     lastname = StringField('Last Name', validators=[DataRequired(), Length(min=2, max=50)])
     email = StringField('Email', validators=[DataRequired(),Email()])
