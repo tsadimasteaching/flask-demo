@@ -69,6 +69,7 @@ def delete_user(userid: int):
     conn.commit()
     cur.close()
     conn.close()
+    return True
 
 def save_user(user):
     conn = get_db_connection()

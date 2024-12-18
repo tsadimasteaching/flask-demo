@@ -63,8 +63,9 @@ def show_user(id):
 def delete_user_from_db(id):
     found=False
     result = delete_user(id)
+    print(result)
     users = get_users()
     if result:
-        return redirect(url_for("show_users", users=users))
+        return render_template('users/users.html', users=users, message="User deleted")
     else:
-        return redirect(url_for("show_users", users=users, message="User not found"))
+        return render_template('users/users.html', users=users, message="User not found")
