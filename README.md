@@ -1,12 +1,22 @@
+### get code
 
+```bash
+git clone https://github.com/tsadimasteaching/flask-demo
+```
 
 ### create virtual environment, activate and install dependencies
 ```bash
+cd flask-demo
 python3 -m venv flaskenv
 source flaskenv/bin/activate
 pip install -r requirements.txt
 ```
 
+### create .env and fill the db params
+
+```bash
+cp .env.example .env
+```
 ### run the app
 ```bash
  flask --app main run --host 0.0.0.0 --port 5000 --debug --reload
