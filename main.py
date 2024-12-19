@@ -6,7 +6,7 @@ import os
 import psycopg2
 import secrets
 from models import User
-from database import get_db_connection, init_db, get_users, save_user, get_user, delete_user
+from database import get_db_connection, init_db, get_users, save_user, get_user, delete_user, edit_user
 app = Flask(__name__)
 bootstrap = Bootstrap5(app)
 csrf = CSRFProtect(app)
@@ -59,12 +59,25 @@ def show_user(id):
     else:
         return render_template('users/users.html',users=users, message="User not found")
 
+@app.route('/user/<int:id>', methods=['POST'])
+def edit_user_post(id):
+    form = UserForm()
+    user = get_user(id)
+    if user:
+        print(user)
+        changed_user = User(form.firstname.data, form.lastname.data, form.email.data, form.birth_year.data)
+        edit_user(changed_user,id)
+        users = get_users()
+        return render_template('users/users.html', users=users, message="User changed")
+    else:
+        users = get_users()
+        return render_template('users/users.html', users=users, message="User not found")
 @app.route('/deleteuser/<int:id>')
 def delete_user_from_db(id):
     found=False
     result = delete_user(id)
     print(result)
-    users = get_users()
+    users = get_users(id)
     if result:
         return render_template('users/users.html', users=users, message="User deleted")
     else:

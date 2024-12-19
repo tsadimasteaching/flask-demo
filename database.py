@@ -79,3 +79,17 @@ def save_user(user):
     conn.commit()
     cur.close()
     conn.close()
+
+def edit_user(user,id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute(
+        'UPDATE users SET first_name = %s, last_name = %s, email = %s, birth_year = %s WHERE id = %s;',
+        (user.firstname, user.lastname, user.email, user.birth_year, id)
+    )
+    print('query')
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
