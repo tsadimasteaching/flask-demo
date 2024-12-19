@@ -28,6 +28,14 @@ def init_db():
                 'email VARCHAR(100),'
                 'birth_year INT);'
                 )
+
+    cur.execute('CREATE TABLE if not exists jobs (id SERIAL PRIMARY KEY,'
+                 'name VARCHAR(100),'
+                 'description VARCHAR(100),'
+                 'user_id INT,'
+                 'FOREIGN KEY (user_id) REFERENCES users(id));'
+                 )
+
     conn.commit()
     cur.close()
     conn.close()
