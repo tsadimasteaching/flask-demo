@@ -1,7 +1,7 @@
 import os
 import psycopg2
 from dotenv import load_dotenv
-from models import User, DBUser
+from models import User, DBUser, DBJob
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 if os.path.exists(dotenv_path):
@@ -49,6 +49,17 @@ def get_users():
     cur.close()
     conn.close()
     return users
+
+def get_jobs():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM jobs;')
+    rows = cur.fetchall()
+    jobs = [DBJob(id=row[0],name=row[1], description=row[2], user_id=row[3]) for row in rows]
+    cur.close()
+    conn.close()
+    return jobs
+
 
 def get_user(userid: int):
     conn = get_db_connection()

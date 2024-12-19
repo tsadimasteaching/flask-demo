@@ -6,7 +6,9 @@ import os
 import psycopg2
 import secrets
 from models import User
-from database import get_db_connection, init_db, get_users, save_user, get_user, delete_user, edit_user
+from database import (get_db_connection, init_db,
+                      get_users, save_user, get_user, delete_user, edit_user,
+                      get_jobs)
 app = Flask(__name__)
 bootstrap = Bootstrap5(app)
 csrf = CSRFProtect(app)
@@ -32,6 +34,12 @@ def show_users():
     users = get_users()
     print(users)
     return render_template('users/users.html', users=users)
+
+@app.route('/jobs')
+def show_jobs():
+    jobs = get_jobs()
+    print(jobs)
+    return render_template('jobs/jobs.html', jobs=jobs)
 
 @app.route('/user', methods=['GET', 'POST'])
 def show_user_form():
