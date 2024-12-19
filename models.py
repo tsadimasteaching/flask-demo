@@ -34,6 +34,14 @@ class DBJob(Job):
         self.description = description
         self.user_id = user_id
 
+class DBJobUser():
+    def __init__(self, name, description, user_id, firstname, lastname):
+        self.name = name
+        self.description = description
+        self.user_id =  user_id
+        self.firstname = firstname
+        self.lastname = lastname
+
 
 class DBUser(User):
     def __init__(self, id, firstname, lastname, email, birth_year):
