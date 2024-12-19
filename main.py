@@ -77,7 +77,7 @@ def delete_user_from_db(id):
     found=False
     result = delete_user(id)
     print(result)
-    users = get_users(id)
+    users = get_users()
     if result:
         return render_template('users/users.html', users=users, message="User deleted")
     else:
