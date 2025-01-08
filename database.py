@@ -36,6 +36,20 @@ def init_db():
                  'FOREIGN KEY (user_id) REFERENCES users(id));'
                  )
 
+    cur.execute('CREATE TABLE if not exists courses (id SERIAL PRIMARY KEY,'
+    'course_name VARCHAR(100) NOT NULL UNIQUE,'
+    'description TEXT);'
+                )
+
+    cur.execute('CREATE TABLE if not exists user_courses (user_id INT NOT NULL,'
+    'course_id INT NOT NULL,'
+    'enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,'
+    'PRIMARY KEY (user_id, course_id),'
+    'CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,'
+    'CONSTRAINT fk_course FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE);'
+                )
+
+
     conn.commit()
     cur.close()
     conn.close()
@@ -67,10 +81,24 @@ def get_jobs():
     return jobs
 
 
+def get_user_jobs(userid: int):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute(
+        'select jobs.name, jobs.description, jobs.user_id, users.first_name, users.last_name FROM jobs inner join users on jobs.user_id = users.id WHERE jobs.user_id = %s;',
+        (userid,)
+    )
+    rows = cur.fetchall()
+    jobs = [DBJobUser(name=row[0], description=row[1], user_id=row[2], firstname=row[3], lastname=row[4]) for row in rows]
+    cur.close()
+    conn.close()
+    return jobs
+
 def get_user(userid: int):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('select jobs.name, jobs.description, jobs.user_id, users.first_name, users.last_name FROM jobs inner join users on jobs.user_id = users.id;', (userid,))
+    # cur.execute('select jobs.name, jobs.description, jobs.user_id, users.first_name, users.last_name FROM jobs inner join users on jobs.user_id = users.id;', (userid,))
+    cur.execute('select * from users where id = %s;', (userid,))
     row = cur.fetchone()
     print(row)
     if row is None:
@@ -117,4 +145,11 @@ def edit_user(user,id):
     cur.close()
     conn.close()
 
-
+def save_job_user(job, user_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('INSERT INTO jobs (name, description, user_id) VALUES (%s, %s, %s);',
+                (job.name, job.description, user_id))
+    conn.commit()
+    cur.close()
+    conn.close()

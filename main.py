@@ -1,14 +1,14 @@
 from flask import Flask, render_template, request, redirect, url_for
-from forms import UserForm
+from forms import UserForm, JobForm
 from flask_wtf.csrf import CSRFProtect
 from flask_bootstrap import Bootstrap5
 import os
 import psycopg2
 import secrets
-from models import User
+from models import User, Job
 from database import (get_db_connection, init_db,
                       get_users, save_user, get_user, delete_user, edit_user,
-                      get_jobs)
+                      get_jobs, get_user_jobs, save_job_user)
 app = Flask(__name__)
 bootstrap = Bootstrap5(app)
 csrf = CSRFProtect(app)
@@ -41,6 +41,32 @@ def show_jobs():
     print(jobs)
     return render_template('jobs/jobs.html', jobs=jobs)
 
+@app.route('/jobs/<int:id>')
+def show_user_jobs(id):
+    jobs = get_user_jobs(id)
+    print(jobs)
+    return render_template('jobs/jobs.html', jobs=jobs)
+
+@app.route('/addjob/<int:id>', methods=['GET','POST'])
+def add_job_to_user(id):
+    user = get_user(id)
+    if user:
+        if request.method == 'GET':
+            form = JobForm(user_id=id)
+            return render_template('jobs/job.html', form=form, user=user)
+        if request.method == 'POST':
+            form = JobForm(user_id=id)
+            if form.validate_on_submit():
+                job = Job(form.name.data, form.description.data, id)
+                save_job_user(job, id)
+                return redirect(url_for("show_user_jobs", id=id))
+            else:
+                return render_template('jobs/job.html', form=form, user=user)
+    else:
+        return render_template('users/users.html',users=users, message="User not found")
+
+
+
 @app.route('/user', methods=['GET', 'POST'])
 def show_user_form():
     if request.method == 'GET':
@@ -56,6 +82,14 @@ def show_user_form():
         else:
             return render_template('users/user.html', form=form)
 
+@app.route('/showuser/<int:id>')
+def show_user_from_db(id):
+    found=False
+    user = get_user(id)
+    if user:
+        return render_template('users/user-details.html', user=user)
+    else:
+        return render_template('users/users.html',users=users, message="User not found")
 
 @app.route('/user/<int:id>')
 def show_user(id):
