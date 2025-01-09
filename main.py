@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
-from forms import UserForm, JobForm, CourseForm
+from forms import UserForm, JobForm, CourseForm, EnrollForm
 from flask_wtf.csrf import CSRFProtect
 from flask_bootstrap import Bootstrap5
 import os
@@ -9,7 +9,7 @@ from models import User, Job, Course
 from database import (get_db_connection, init_db,
                       get_users, save_user, get_user, delete_user, edit_user,
                       get_jobs, get_user_jobs, save_job_user, get_courses, get_course,
-                      save_course)
+                      save_course, enroll_users_to_course, get_user_courses)
 app = Flask(__name__)
 bootstrap = Bootstrap5(app)
 csrf = CSRFProtect(app)
@@ -148,10 +148,26 @@ def show_course_form():
         else:
             return render_template('users/user.html', form=form)
 
+@app.route('/course/<int:id>/users')
+def show_course_users(id):
+    course = get_course(id)
+    users = get_user_courses(id)
+    if course:
+        return render_template('users/users.html', id=id, course=course, users=users)
 
-@app.route('/enroll/<int:id>')
+@app.route('/enroll/<int:id>', methods=['GET', 'POST'])
 def enroll_users(id):
     course = get_course(id)
+    users = get_users()
     if course:
+        form = EnrollForm(course_id=id)
+        form.user_id.choices = [(user.id, user.firstname + ' ' + user.lastname) for user in users]
         if request.method == 'GET':
-            return render_template('courses/enroll.html', id=id, course=course)
+            return render_template('courses/enroll.html', id=id, course=course, form=form)
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                selected_users = form.user_id.data
+                for user_id in selected_users:
+                    enroll_users_to_course(user_id, id)
+                print(selected_users)
+                return render_template('courses/courses.html', id=id, course=course)

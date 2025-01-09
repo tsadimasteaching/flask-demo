@@ -185,3 +185,23 @@ def save_job_user(job, user_id):
     conn.commit()
     cur.close()
     conn.close()
+
+
+def enroll_users_to_course(user_id, course_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('INSERT INTO user_courses (user_id, course_id) VALUES (%s, %s);',
+                (user_id, course_id))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def get_user_courses(course_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM users JOIN user_courses ON users.id = user_courses.user_id JOIN courses ON user_courses.course_id = courses.id WHERE courses.id = %s;', (course_id,))
+    rows = cur.fetchall()
+    users = [DBUser(id=row[0], firstname=row[1], lastname=row[2], email=row[3], birth_year=row[4]) for row in rows]
+    cur.close()
+    conn.close()
+    return users
