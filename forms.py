@@ -16,3 +16,8 @@ class JobForm(FlaskForm):
     description = StringField('Description', validators=[DataRequired(), Length(min=2, max=200)])
     user_id = IntegerField('User Id', validators=[ReadOnly()])
     submit = SubmitField('Submit')
+
+class CourseForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired(), Length(min=2, max=50)])
+    description = StringField('Description', validators=[DataRequired(), Length(min=2, max=200)])
+    submit = SubmitField('Submit')

@@ -1,14 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for
-from forms import UserForm, JobForm
+from forms import UserForm, JobForm, CourseForm
 from flask_wtf.csrf import CSRFProtect
 from flask_bootstrap import Bootstrap5
 import os
 import psycopg2
 import secrets
-from models import User, Job
+from models import User, Job, Course
 from database import (get_db_connection, init_db,
                       get_users, save_user, get_user, delete_user, edit_user,
-                      get_jobs, get_user_jobs, save_job_user)
+                      get_jobs, get_user_jobs, save_job_user, get_courses, get_course,
+                      save_course)
 app = Flask(__name__)
 bootstrap = Bootstrap5(app)
 csrf = CSRFProtect(app)
@@ -34,6 +35,12 @@ def show_users():
     users = get_users()
     print(users)
     return render_template('users/users.html', users=users)
+
+@app.route('/courses')
+def show_courses():
+    courses = get_courses()
+    print(users)
+    return render_template('courses/courses.html', courses=courses)
 
 @app.route('/jobs')
 def show_jobs():
@@ -124,3 +131,27 @@ def delete_user_from_db(id):
         return render_template('users/users.html', users=users, message="User deleted")
     else:
         return render_template('users/users.html', users=users, message="User not found")
+
+@app.route('/course', methods=['GET', 'POST'])
+def show_course_form():
+    if request.method == 'GET':
+        form = CourseForm()
+        return render_template('courses/course.html', form=form)
+    if request.method == 'POST':
+        form = CourseForm()
+        courses = get_courses()
+        if form.validate_on_submit():
+            course = Course(form.name.data, form.description.data)
+            save_course(course)
+            print(users)
+            return redirect(url_for("show_courses", courses=courses))
+        else:
+            return render_template('users/user.html', form=form)
+
+
+@app.route('/enroll/<int:id>')
+def enroll_users(id):
+    course = get_course(id)
+    if course:
+        if request.method == 'GET':
+            return render_template('courses/enroll.html', id=id, course=course)

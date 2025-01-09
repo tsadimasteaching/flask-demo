@@ -53,3 +53,18 @@ class DBUser(User):
 
         def __str__(self):
             return f'{self.firstname} {self.lastname}'
+
+class Course():
+    def __init__(self, name, description):
+        self.name = name
+        self.description = description
+
+
+    def __str__(self):
+        return f'{self.name}'
+
+class DBCourse(Course):
+    def __init__(self, id, name, description):
+        self.id = id
+        self.name = name
+        self.description = description
