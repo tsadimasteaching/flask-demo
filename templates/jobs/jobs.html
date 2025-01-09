@@ -10,9 +10,7 @@
   <tr>
     <th scope="col">Name</th>
     <th scope="col">Description</th>
-    <th scope="col">User ID</th>
-      <th scope="col">Firstname</th>
-      <th scope="col">Lastname</th>
+    <th scope="col">User</th>
   </tr>
 </thead>
 <tbody>
@@ -20,9 +18,7 @@
   <tr scope="row">
      <td>{{ job.name }}</td>
     <td>{{ job.description }}</td>
-    <td>{{ job.user_id }}</td>
-      <td>{{ job.firstname }}</td>
-      <td>{{ job.lastname }}</td>
+    <td><a href="/showuser/{{job.user_id }}">{{ job.firstname}}  {{job.lastname}}</a></td>
     <td>
 
     </td>
